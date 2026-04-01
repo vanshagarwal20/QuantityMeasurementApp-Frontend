@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Quantity Measurement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #275bff;
+            --primary-dark: #1849dc;
+            --accent: #00b8b0;
+            --text-main: #0f172a;
+            --text-soft: #52607a;
+            --stroke: #dbe4ff;
+            --bg-start: #eef2ff;
+            --bg-end: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Manrope", sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            background: radial-gradient(circle at 15% 20%, rgba(57, 114, 255, 0.2), transparent 35%),
+                radial-gradient(circle at 85% 80%, rgba(0, 184, 176, 0.12), transparent 30%),
+                linear-gradient(145deg, var(--bg-start), var(--bg-end));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 420px;
+            background: linear-gradient(180deg, #ffffff, #f7f9ff);
+            border: 1px solid rgba(101, 132, 255, 0.22);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 16px 35px rgba(27, 56, 124, 0.14);
+        }
+
+        .auth-header {
+            padding: 28px 24px;
+            text-align: center;
+            background: linear-gradient(110deg, var(--primary), #47a0ff);
+        }
+
+        .auth-header h1 {
+            margin: 0 0 6px;
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .auth-header p {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.9rem;
+        }
+
+        .auth-body {
+            padding: 28px 24px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-soft);
+            font-weight: 700;
+            letter-spacing: 0.8px;
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid var(--stroke);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            color: var(--text-main);
+            background: #ffffff;
+            transition: border-color 0.2s ease, outline 0.2s ease;
+        }
+
+        input:focus {
+            outline: 3px solid rgba(39, 91, 255, 0.18);
+            border-color: #7b9bff;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(115deg, var(--primary), #4f7fff);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 6px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(39, 91, 255, 0.28);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 20px 0;
+            color: var(--text-soft);
+            font-size: 0.8rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--stroke);
+        }
+
+        .google-btn-container {
+            display: flex;
+            justify-content: center;
+            min-height: 45px;
+        }
+
+        .toggle-section {
+            text-align: center;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--stroke);
+        }
+
+        .toggle-text {
+            color: var(--text-soft);
+            font-size: 0.9rem;
+        }
+
+        .toggle-btn {
+            color: var(--primary);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            text-decoration: underline;
+            font-size: 0.9rem;
+        }
+
+        .toggle-btn:hover {
+            color: var(--primary-dark);
+        }
+
+        .error-msg {
+            display: none;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            font-size: 0.85rem;
+            border-left: 4px solid #dc2626;
+        }
+
+        .error-msg.show {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                border-radius: 12px;
+            }
+
+            .auth-header {
+                padding: 20px 16px;
+            }
+
+            .auth-header h1 {
+                font-size: 1.3rem;
+            }
+
+            .auth-body {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>Quantity Measurement</h1>
+            <p>Login or Register to continue</p>
+        </div>
+
+        <div class="auth-body">
+            <div id="loginSection">
+                <div class="error-msg" id="loginError"></div>
+                <h2 style="margin: 0 0 16px; font-size: 1.1rem;">Sign In</h2>
+                <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required placeholder="your@email.com" />
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" />
+                    </div>
+                    <button type="submit" class="submit-btn">Sign In</button>
+                </form>
+
+                <div class="divider">or</div>
+
+                <div class="google-btn-container" id="googleLoginContainer"></div>
+
+                <div class="toggle-section">
+                    <span class="toggle-text">Don't have an account?</span>
+                    <button class="toggle-btn" onclick="toggleToRegister()">Register here</button>
+                </div>
+            </div>
+
+            <div id="registerSection" style="display: none;">
+                <div class="error-msg" id="registerError"></div>
+                <h2 style="margin: 0 0 16px; font-size: 1.1rem;">Create Account</h2>
+                <form id="registerForm" onsubmit="handleRegisterSubmit(event)">
+                    <div class="form-group">
+                        <label for="registerName">Full Name</label>
+                        <input type="text" id="registerName" required placeholder="John Doe" />
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" required placeholder="your@email.com" />
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" required placeholder="••••••••" />
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPasswordConfirm">Confirm Password</label>
+                        <input type="password" id="registerPasswordConfirm" required placeholder="••••••••" />
+                    </div>
+                    <button type="submit" class="submit-btn">Create Account</button>
+                </form>
+
+                <div class="divider">or</div>
+
+                <div class="google-btn-container" id="googleRegisterContainer"></div>
+
+                <div class="toggle-section">
+                    <span class="toggle-text">Already have an account?</span>
+                    <button class="toggle-btn" onclick="toggleToLogin()">Sign in here</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        const GOOGLE_CLIENT_ID = "748022580959-3cncptn08mld83lnfl51jahg1vm58iuh.apps.googleusercontent.com";
+
+        function toggleToRegister() {
+            document.getElementById("loginSection").style.display = "none";
+            document.getElementById("registerSection").style.display = "block";
+            setTimeout(renderGoogleRegisterButton, 100);
+        }
+
+        function toggleToLogin() {
+            document.getElementById("registerSection").style.display = "none";
+            document.getElementById("loginSection").style.display = "block";
+            setTimeout(renderGoogleLoginButton, 100);
+        }
+
+        function parseJwtToken(token) {
+            try {
+                const base64 = token
+                    .split(".")[1]
+                    .replace(/-/g, "+")
+                    .replace(/_/g, "/");
+                const decoded = decodeURIComponent(
+                    atob(base64)
+                        .split("")
+                        .map((char) => `%${(`00${char.charCodeAt(0).toString(16)}`).slice(-2)}`)
+                        .join("")
+                );
+                return JSON.parse(decoded);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function handleGoogleResponse(response, mode) {
+            const payload = parseJwtToken(response.credential || "");
+            if (!payload) {
+                const errorMsg = mode === "login" ? document.getElementById("loginError") : document.getElementById("registerError");
+                errorMsg.textContent = "Google sign-in failed. Please try again.";
+                errorMsg.classList.add("show");
+                return;
+            }
+
+            const user = {
+                mode: mode,
+                name: payload.name,
+                email: payload.email,
+                avatar: payload.picture,
+                loginMethod: "google"
+            };
+
+            localStorage.setItem("qmaUser", JSON.stringify(user));
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 200);
+        }
+
+        function renderGoogleLoginButton() {
+            const container = document.getElementById("googleLoginContainer");
+            if (!window.google || !window.google.accounts) {
+                console.error("Google SDK not loaded");
+                return;
+            }
+
+            container.innerHTML = "";
+            window.google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: (response) => handleGoogleResponse(response, "login")
+            });
+
+            window.google.accounts.id.renderButton(container, {
+                theme: "filled_blue",
+                size: "large",
+                text: "signin_with",
+                shape: "pill"
+            });
+        }
+
+        function renderGoogleRegisterButton() {
+            const container = document.getElementById("googleRegisterContainer");
+            if (!window.google || !window.google.accounts) {
+                console.error("Google SDK not loaded");
+                return;
+            }
+
+            container.innerHTML = "";
+            window.google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: (response) => handleGoogleResponse(response, "register")
+            });
+
+            window.google.accounts.id.renderButton(container, {
+                theme: "filled_blue",
+                size: "large",
+                text: "signup_with",
+                shape: "pill"
+            });
+        }
+
+        function handleLoginSubmit(event) {
+            event.preventDefault();
+            const email = document.getElementById("loginEmail").value;
+            const password = document.getElementById("loginPassword").value;
+
+            if (email && password) {
+                const user = {
+                    mode: "login",
+                    email: email,
+                    name: email.split("@")[0],
+                    loginMethod: "email"
+                };
+                localStorage.setItem("qmaUser", JSON.stringify(user));
+                window.location.href = "dashboard.html";
+            }
+        }
+
+        function handleRegisterSubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById("registerName").value;
+            const email = document.getElementById("registerEmail").value;
+            const password = document.getElementById("registerPassword").value;
+            const passwordConfirm = document.getElementById("registerPasswordConfirm").value;
+
+            if (password !== passwordConfirm) {
+                document.getElementById("registerError").textContent = "Passwords do not match!";
+                document.getElementById("registerError").classList.add("show");
+                return;
+            }
+
+            const user = {
+                mode: "register",
+                email: email,
+                name: name,
+                loginMethod: "email"
+            };
+            localStorage.setItem("qmaUser", JSON.stringify(user));
+            window.location.href = "dashboard.html";
+        }
+
+        // Initialize Google buttons on page load
+        window.addEventListener("load", renderGoogleLoginButton);
+    </script>
+</body>
+
+</html>
