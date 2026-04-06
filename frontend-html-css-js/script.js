@@ -81,7 +81,7 @@ let currentType = "length";
 let currentAction = "comparison";
 
 // Replace with your real OAuth Web Client ID from Google Cloud Console.
-const GOOGLE_CLIENT_ID = "748022580959-3cncptn08mld83lnfl51jahg1vm58iuh.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "615365280199-1s4fht7q8kqldoic283m860obnjvaep6.apps.googleusercontent.com";
 let googleMode = "login";
 let currentUser = JSON.parse(localStorage.getItem("qmaUser") || "null");
 

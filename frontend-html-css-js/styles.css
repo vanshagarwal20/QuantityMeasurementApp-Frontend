@@ -111,7 +111,7 @@ body {
 
 .panel-header h1 {
     margin: 0;
-    color: #ffffff;
+    color: #ffffffe5;
     font-size: 1.3rem;
     letter-spacing: 0.3px;
     font-weight: 800;
@@ -130,6 +130,24 @@ body {
     color: #ffffff;
     font-size: 0.95rem;
     font-weight: 600;
+}
+
+.auth-link-btn {
+    color: #ffffff;
+    background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.auth-link-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
 }
 
 .auth-buttons,
@@ -321,7 +339,7 @@ body {
 
 .action-tabs {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
 }
 
@@ -545,6 +563,57 @@ output.value-output {
     margin-top: 12px;
     border-left: 5px solid var(--accent);
     background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, transparent 100%);
+}
+
+.history-login-hint,
+.history-empty {
+    border: 2px dashed rgba(99, 102, 241, 0.25);
+    border-radius: 14px;
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(20, 184, 166, 0.08) 100%);
+    margin-bottom: 12px;
+}
+
+.history-login-hint p,
+.history-empty {
+    margin: 0;
+    color: var(--text-soft);
+    font-weight: 600;
+}
+
+.history-login-hint .auth-link-btn {
+    margin-top: 12px;
+}
+
+.history-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+}
+
+.history-item {
+    border: 2px solid rgba(139, 92, 246, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f3f0ff 0%, #ecfdf5 100%);
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.12);
+}
+
+.history-meta {
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-size: 0.72rem;
+    color: var(--text-soft);
+    font-weight: 700;
+}
+
+.history-expression {
+    margin: 0;
+    font-weight: 700;
+    color: var(--text-main);
 }
 
 @media (max-width: 760px) {

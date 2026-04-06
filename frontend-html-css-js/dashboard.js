@@ -1,19 +1,8 @@
-// Auth check - redirect if not logged in
-function checkAuth() {
-    const user = JSON.parse(localStorage.getItem("qmaUser") || "null");
-    if (!user) {
-        window.location.href = "auth.html";
-        return null;
-    }
-    return user;
+function getCurrentUser() {
+    return JSON.parse(localStorage.getItem("qmaUser") || "null");
 }
 
-const currentUser = checkAuth();
-
-// Display user name
-if (currentUser) {
-    document.getElementById("userName").textContent = `Hi, ${currentUser.name}!`;
-}
+let currentUser = getCurrentUser();
 
 const unitSets = {
     length: {
@@ -50,7 +39,9 @@ const unitSets = {
             if (from === "Fahrenheit") celsius = (value - 32) * (5 / 9);
             if (from === "Kelvin") celsius = value - 273.15;
 
-            if (to === "Celsius") return celsius;
+            if (to === "Celsius") {
+                return celsius;
+            }
             if (to === "Fahrenheit") return celsius * (9 / 5) + 32;
             return celsius + 273.15;
         }
@@ -72,7 +63,8 @@ const ui = {
     sections: {
         comparison: document.getElementById("comparisonSection"),
         conversion: document.getElementById("conversionSection"),
-        arithmetic: document.getElementById("arithmeticSection")
+        arithmetic: document.getElementById("arithmeticSection"),
+        history: document.getElementById("historySection")
     },
 
     comparisonFromValue: document.getElementById("comparisonFromValue"),
@@ -91,11 +83,112 @@ const ui = {
     arithUnit2: document.getElementById("arithUnit2"),
     arithOperator: document.getElementById("arithOperator"),
     arithResultUnit: document.getElementById("arithResultUnit"),
-    arithResult: document.getElementById("arithResult")
+    arithResult: document.getElementById("arithResult"),
+
+    userName: document.getElementById("userName"),
+    loginBtn: document.getElementById("loginBtn"),
+    logoutBtn: document.getElementById("logoutBtn"),
+    historyTab: document.getElementById("historyTab"),
+    goToAuthBtn: document.getElementById("goToAuthBtn"),
+    historyList: document.getElementById("historyList"),
+    historyEmptyMessage: document.getElementById("historyEmptyMessage"),
+    historyLoginHint: document.getElementById("historyLoginHint")
 };
 
 let currentType = "length";
 let currentAction = "comparison";
+let lastHistorySignature = "";
+
+const HISTORY_STORAGE_KEY = "qmaOperationHistory";
+
+function getUserHistoryMap() {
+    return JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || "{}");
+}
+
+function saveUserHistoryMap(map) {
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(map));
+}
+
+function addHistoryEntry(action, expression) {
+    if (!currentUser || !currentUser.email) {
+        return;
+    }
+
+    const signature = `${action}:${expression}`;
+    if (signature === lastHistorySignature) {
+        return;
+    }
+
+    const map = getUserHistoryMap();
+    const userKey = currentUser.email;
+    const records = map[userKey] || [];
+
+    records.unshift({
+        action,
+        expression,
+        timestamp: new Date().toISOString()
+    });
+
+    map[userKey] = records.slice(0, 50);
+    saveUserHistoryMap(map);
+    lastHistorySignature = signature;
+
+    if (currentAction === "history") {
+        renderHistory();
+    }
+}
+
+function renderHistory() {
+    const isLoggedIn = Boolean(currentUser && currentUser.email);
+
+    ui.historyLoginHint.classList.toggle("hidden", isLoggedIn);
+    ui.historyList.classList.toggle("hidden", !isLoggedIn);
+
+    if (!isLoggedIn) {
+        ui.historyList.innerHTML = "";
+        ui.historyEmptyMessage.classList.add("hidden");
+        return;
+    }
+
+    const map = getUserHistoryMap();
+    const records = map[currentUser.email] || [];
+
+    if (!records.length) {
+        ui.historyList.innerHTML = "";
+        ui.historyEmptyMessage.classList.remove("hidden");
+        return;
+    }
+
+    ui.historyEmptyMessage.classList.add("hidden");
+    ui.historyList.innerHTML = records.map((entry) => {
+        const time = new Date(entry.timestamp).toLocaleString();
+        return `
+            <li class="history-item">
+                <p class="history-meta">${entry.action} | ${time}</p>
+                <p class="history-expression">${entry.expression}</p>
+            </li>
+        `;
+    }).join("");
+}
+
+function syncAuthUI() {
+    const isLoggedIn = Boolean(currentUser);
+    ui.userName.textContent = isLoggedIn ? `Hi, ${currentUser.name || currentUser.email}!` : "Guest Mode";
+    ui.loginBtn.classList.toggle("hidden", isLoggedIn);
+    ui.logoutBtn.classList.toggle("hidden", !isLoggedIn);
+    ui.historyTab.classList.toggle("hidden", !isLoggedIn);
+
+    if (!isLoggedIn && currentAction === "history") {
+        currentAction = "comparison";
+        showActionSection(currentAction);
+
+        ui.actionTabs.forEach((item) => {
+            const isActive = item.dataset.action === currentAction;
+            item.classList.toggle("active", isActive);
+            item.setAttribute("aria-selected", isActive ? "true" : "false");
+        });
+    }
+}
 
 function formatNumber(value) {
     if (!Number.isFinite(value)) return "0";
@@ -128,30 +221,53 @@ function convertValue(value, from, to) {
     return unitSets[currentType].convert(Number(value), from, to);
 }
 
-function updateComparison() {
+function updateComparison(shouldRecord = true) {
     const fromValue = Number(ui.comparisonFromValue.value || 0);
-    const converted = convertValue(fromValue, ui.comparisonFromUnit.value, ui.comparisonToUnit.value);
-    ui.comparisonToValue.textContent = formatNumber(converted);
+    const fromUnit = ui.comparisonFromUnit.value;
+    const toUnit = ui.comparisonToUnit.value;
+    const converted = convertValue(fromValue, fromUnit, toUnit);
+    const result = formatNumber(converted);
+    ui.comparisonToValue.textContent = result;
+
+    if (shouldRecord) {
+        addHistoryEntry("Comparison", `${formatNumber(fromValue)} ${fromUnit} = ${result} ${toUnit}`);
+    }
 }
 
-function updateConversion() {
+function updateConversion(shouldRecord = true) {
     const value = Number(ui.conversionInput.value || 0);
-    const converted = convertValue(value, ui.conversionFromUnit.value, ui.conversionToUnit.value);
-    ui.conversionResult.textContent = formatNumber(converted);
+    const fromUnit = ui.conversionFromUnit.value;
+    const toUnit = ui.conversionToUnit.value;
+    const converted = convertValue(value, fromUnit, toUnit);
+    const result = formatNumber(converted);
+    ui.conversionResult.textContent = result;
+
+    if (shouldRecord) {
+        addHistoryEntry("Conversion", `${formatNumber(value)} ${fromUnit} = ${result} ${toUnit}`);
+    }
 }
 
-function updateArithmetic() {
+function updateArithmetic(shouldRecord = true) {
     const v1 = Number(ui.arithValue1.value || 0);
     const v2 = Number(ui.arithValue2.value || 0);
+    const unit1 = ui.arithUnit1.value;
+    const unit2 = ui.arithUnit2.value;
+    const resultUnit = ui.arithResultUnit.value;
+    const operator = ui.arithOperator.value;
 
-    const v1InResultUnit = convertValue(v1, ui.arithUnit1.value, ui.arithResultUnit.value);
-    const v2InResultUnit = convertValue(v2, ui.arithUnit2.value, ui.arithResultUnit.value);
+    const v1InResultUnit = convertValue(v1, unit1, resultUnit);
+    const v2InResultUnit = convertValue(v2, unit2, resultUnit);
 
-    const result = ui.arithOperator.value === "+"
+    const result = operator === "+"
         ? v1InResultUnit + v2InResultUnit
         : v1InResultUnit - v2InResultUnit;
 
-    ui.arithResult.textContent = formatNumber(result);
+    const formattedResult = formatNumber(result);
+    ui.arithResult.textContent = formattedResult;
+
+    if (shouldRecord) {
+        addHistoryEntry("Arithmetic", `${formatNumber(v1)} ${unit1} ${operator} ${formatNumber(v2)} ${unit2} = ${formattedResult} ${resultUnit}`);
+    }
 }
 
 function showActionSection(action) {
@@ -160,10 +276,10 @@ function showActionSection(action) {
     });
 }
 
-function refreshAll() {
-    updateComparison();
-    updateConversion();
-    updateArithmetic();
+function refreshAll(shouldRecord = false) {
+    updateComparison(shouldRecord);
+    updateConversion(shouldRecord);
+    updateArithmetic(shouldRecord);
 }
 
 ui.typeCards.forEach((card) => {
@@ -176,7 +292,7 @@ ui.typeCards.forEach((card) => {
         });
 
         setDefaultOptions();
-        refreshAll();
+        refreshAll(false);
     });
 });
 
@@ -190,6 +306,10 @@ ui.actionTabs.forEach((tab) => {
         });
 
         showActionSection(currentAction);
+
+        if (currentAction === "history") {
+            renderHistory();
+        }
     });
 });
 
@@ -214,17 +334,30 @@ ui.actionTabs.forEach((tab) => {
     ui.arithResultUnit
 ].forEach((el) => el.addEventListener("input", updateArithmetic));
 
-// Logout handler
-document.getElementById("logoutBtn").addEventListener("click", () => {
+ui.loginBtn.addEventListener("click", () => {
+    window.location.href = "auth.html";
+});
+
+ui.goToAuthBtn.addEventListener("click", () => {
+    window.location.href = "auth.html";
+});
+
+ui.logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("qmaUser");
+    currentUser = null;
 
     if (window.google && window.google.accounts && window.google.accounts.id) {
         window.google.accounts.id.disableAutoSelect();
     }
 
-    window.location.href = "auth.html";
+    syncAuthUI();
+
+    if (currentAction === "history") {
+        renderHistory();
+    }
 });
 
 setDefaultOptions();
 showActionSection(currentAction);
-refreshAll();
+refreshAll(false);
+syncAuthUI();
