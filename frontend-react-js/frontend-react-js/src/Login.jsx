@@ -10,30 +10,27 @@ function Login({ onLoginSuccess }) {
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setError('');
   };
-
-  const handleSubmit = (event) => {
+  
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
-
-    const result = loginWithEmail(formData);
-    if (!result.ok) {
-      setError(result.error);
-      return;
-    }
-
+    const result = await loginWithEmail(formData);  // now async
+    if (!result.ok) { setError(result.error); return; }
     onLoginSuccess(result.session);
   };
 
-  const handleSuccess = (credentialResponse) => {
-    const result = loginWithGoogleCredential(credentialResponse);
+  // Also update handleSuccess for Google:
+  const handleSuccess = async (credentialResponse) => {
+    const result = await loginWithGoogleCredential(credentialResponse);
     if (!result.ok) {
-      setError(result.error);
+      setError(result.error || "Invalid email or password");
       return;
     }
-
     onLoginSuccess(result.session);
   };
+
 
   const handleError = () => {
     setError('Google login failed. Try email and password.');
@@ -86,9 +83,9 @@ function Login({ onLoginSuccess }) {
 
         <div className="google-btn-wrapper">
           <GoogleLogin
+            key="google-login"
             onSuccess={handleSuccess}
             onError={handleError}
-            useOneTap
             shape="rectangular"
             theme="outline"
             size="large"
