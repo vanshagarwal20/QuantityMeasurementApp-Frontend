@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <!-- ✅ FIX: Changed /vite.svg to /favicon.svg — vite.svg doesn't exist in
+         your /public folder, only favicon.svg does. This fixes the 404 error. -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quantity Measurement App</title>
+
+  <!-- ✅ FIX: Cross-Origin-Opener-Policy header.
+         Google Sign-In uses a popup window and communicates back via
+         window.postMessage. The browser's default COOP policy is
+         "same-origin" on some Render deployments, which blocks cross-origin
+         postMessage calls — exactly what you see in the console.
+         Setting it to "same-origin-allow-popups" allows the Google OAuth
+         popup to post its credential message back to your app window. -->
+  <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups" />
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
