@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Ruler, Scale, Thermometer, Beaker, LogOut, LogIn, UserPlus } from 'lucide-react';
 import { addHistoryItem, getUserHistory } from './auth';
+import { qmaApi } from './api/qmaApi';
 
 const MEASUREMENTS = {
   Length: { Kilometer: 1000, Meter: 1, Centimeter: 0.01, Millimeter: 0.001, Mile: 1609.34, Yard: 0.9144, Foot: 0.3048, Inch: 0.0254 },
@@ -80,11 +81,44 @@ function Home({ isAuthenticated, user, onLogout }) {
   }, [activeType, activeAction]);
 
   useEffect(() => {
-    if (activeAction === 'Conversion') {
-      const converted = convertValue(val1, activeType, unit1, unit2);
-      setVal2(converted);
+    if (activeAction !== 'Conversion' || val1 === '') return;
+
+    const token = localStorage.getItem('qm_jwt_token');
+
+    const payload = {
+      thisQuantity: {
+        value: parseFloat(val1),
+        unit: unit1.toUpperCase(),
+        measurementType: activeType
+      },
+      thatQuantity: {
+        value: 0,
+        unit: unit2.toUpperCase(),
+        measurementType: activeType
+      }
+    };
+
+    // ✅ IF LOGGED IN → BACKEND
+    if (token) {
+      qmaApi.convert(payload)
+        .then(({ data }) => setVal2(data.result))
+        .catch(() => {
+          // fallback to local if backend fails
+          const localResult = convertValue(val1, activeType, unit1, unit2);
+          setVal2(localResult);
+        });
     }
-  }, [val1, unit1, unit2, activeAction, activeType]);
+    // ✅ IF NOT LOGGED IN → LOCAL
+    else {
+      const localResult = convertValue(val1, activeType, unit1, unit2);
+      setVal2(localResult);
+    }
+
+  }, [val1, unit1, unit2, activeType, activeAction]);
+
+  // For arithmetic and comparison, call qmaApi.add/subtract/multiply/divide/compare
+  // with the same payload structure. The result field contains the answer.
+
 
   // Auto-save operation when details change
   useEffect(() => {
@@ -161,6 +195,12 @@ function Home({ isAuthenticated, user, onLogout }) {
   ];
 
   const displayActions = isAuthenticated ? [...ACTIONS, 'History'] : ACTIONS;
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setActiveAction('Conversion'); // ✅ force reset after logout
+    }
+  }, [isAuthenticated]);
 
   const formatHistoryTime = (timestamp) => {
     if (!timestamp) return '';
