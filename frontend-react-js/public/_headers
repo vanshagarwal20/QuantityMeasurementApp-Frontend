@@ -1,0 +1,8 @@
+# ✅ Render static site headers file
+# Place this file in your /public folder.
+# Render serves it automatically for all routes.
+# This fixes the Cross-Origin-Opener-Policy warning for Google OAuth popup.
+
+/*
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Cross-Origin-Embedder-Policy: unsafe-none

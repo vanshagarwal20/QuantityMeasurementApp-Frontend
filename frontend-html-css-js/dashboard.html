@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Quantity Measurement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <main class="app-shell">
+        <section class="panel">
+            <header class="panel-header">
+                <div class="header-top">
+                    <h1>Welcome To Quantity Measurement</h1>
+                    <div class="user-section">
+                        <span id="userName" class="user-name"></span>
+                        <button id="loginBtn" class="auth-link-btn">Login / Signup</button>
+                        <button id="logoutBtn" class="danger-btn">Logout</button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="panel-body">
+                <section class="block">
+                    <p class="block-label">Choose Type</p>
+                    <div class="type-grid" role="tablist" aria-label="Measurement type">
+                        <button class="type-card active" data-type="length" role="tab" aria-selected="true">
+                            <span class="type-icon">📏</span>
+                            <span>Length</span>
+                        </button>
+                        <button class="type-card" data-type="weight" role="tab" aria-selected="false">
+                            <span class="type-icon">⚖️</span>
+                            <span>Weight</span>
+                        </button>
+                        <button class="type-card" data-type="temperature" role="tab" aria-selected="false">
+                            <span class="type-icon">🌡️</span>
+                            <span>Temperature</span>
+                        </button>
+                        <button class="type-card" data-type="volume" role="tab" aria-selected="false">
+                            <span class="type-icon">🧪</span>
+                            <span>Volume</span>
+                        </button>
+                    </div>
+                </section>
+
+                <section class="block">
+                    <p class="block-label">Choose Action</p>
+                    <div class="action-tabs" role="tablist" aria-label="Action mode">
+                        <button class="action-tab active" data-action="comparison" role="tab"
+                            aria-selected="true">Comparison</button>
+                        <button class="action-tab" data-action="conversion" role="tab"
+                            aria-selected="false">Conversion</button>
+                        <button class="action-tab" data-action="arithmetic" role="tab"
+                            aria-selected="false">Arithmetic</button>
+                        <button id="historyTab" class="action-tab" data-action="history" role="tab"
+                            aria-selected="false">History</button>
+                    </div>
+                </section>
+
+                <section class="mode-section" id="comparisonSection">
+                    <div class="dual-input-row">
+                        <div class="input-card">
+                            <label for="comparisonFromValue">From</label>
+                            <input id="comparisonFromValue" type="number" step="any" value="1" />
+                            <select id="comparisonFromUnit"></select>
+                        </div>
+
+                        <div class="input-card">
+                            <label for="comparisonToValue">To</label>
+                            <output id="comparisonToValue" class="value-output">1000</output>
+                            <select id="comparisonToUnit"></select>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mode-section hidden" id="conversionSection">
+                    <div class="single-result-layout">
+                        <div class="input-card full-width">
+                            <label for="conversionInput">Value</label>
+                            <input id="conversionInput" type="number" step="any" value="1" />
+                            <select id="conversionFromUnit"></select>
+                        </div>
+
+                        <div class="result-card">
+                            <p>Converted Value</p>
+                            <h2 id="conversionResult">1000</h2>
+                            <select id="conversionToUnit"></select>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mode-section hidden" id="arithmeticSection">
+                    <div class="dual-input-row arithmetic-row">
+                        <div class="input-card">
+                            <label for="arithValue1">Value 1</label>
+                            <input id="arithValue1" type="number" step="any" value="1" />
+                            <select id="arithUnit1"></select>
+                        </div>
+
+                        <div class="operator-card">
+                            <select id="arithOperator" aria-label="Arithmetic operator">
+                                <option value="+">+</option>
+                                <option value="-">-</option>
+                            </select>
+                        </div>
+
+                        <div class="input-card">
+                            <label for="arithValue2">Value 2</label>
+                            <input id="arithValue2" type="number" step="any" value="1" />
+                            <select id="arithUnit2"></select>
+                        </div>
+                    </div>
+
+                    <div class="result-card result-inline">
+                        <p>Result</p>
+                        <h2 id="arithResult">1.001</h2>
+                        <select id="arithResultUnit"></select>
+                    </div>
+                </section>
+
+                <section class="mode-section hidden" id="historySection">
+                    <div id="historyLoginHint" class="history-login-hint hidden">
+                        <p>To view history, please log in or sign up.</p>
+                        <button id="goToAuthBtn" class="auth-link-btn">Go To Login</button>
+                    </div>
+
+                    <div id="historyEmptyMessage" class="history-empty hidden">
+                        No operation history yet.
+                    </div>
+
+                    <ul id="historyList" class="history-list"></ul>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
